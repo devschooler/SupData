@@ -6,6 +6,14 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
+
+import pandas_datareader.data as web
+import datetime
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+
+
 working_directory = 'jars/*'
 
 spark = SparkSession \
@@ -258,3 +266,34 @@ total_months_after_hired = time_after_hired_canada + time_after_hired_lyon + tim
 #print(total_months_after_hired)
 average_length_hired = total_months_after_hired / total_students
 print('les eleves sont engages en moyenne apres ', average_length_hired , 'mois')
+
+app = dash.Dash()
+stock = 'TSLA'
+start = datetime.datetime(2015, 1, 1)
+end = datetime.datetime(2018, 2, 8)
+df = web.DataReader(stock, 'yahoo', start, end)
+df.reset_index(inplace=True)
+df.set_index("Date", inplace=True)
+
+app.layout = html.Div(children=[
+    html.H1(children='Whoa, a graph!'),
+
+    html.Div(children='''
+        Making a stock graph!.
+    '''),
+
+    dcc.Graph(
+        id='example-graph',
+        figure={
+            'data': [
+                {'x': ['students hired after fair','students not hired after faur'], 'y': [number_hired_after_fair,total_students], 'type': 'line', 'name': stock},
+            ],
+            'layout': {
+                'title': stock
+            }
+        }
+    )
+])
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
