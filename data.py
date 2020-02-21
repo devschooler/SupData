@@ -16,6 +16,7 @@ import dash_html_components as html
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 
 
 working_directory = 'jars/*'
@@ -186,9 +187,28 @@ moyenne_marseille = total_notes_marseille / marseilleStudentNumber
 print( 'la moyenne de Marseille est ' , moyenne_marseille)
 app = dash.Dash()
 
-app.layout = html.Div(children=[
-    html.H1(children='SupData Dashboard'),
-  dcc.Graph(
+
+
+
+app.layout = html.Div([
+    html.H1('Supinfo Big Data Dashboard'),
+    dcc.Tabs(id="tabs-example", value='tab-1-example', children=[
+        dcc.Tab(label='Indicateurs de reussite', value='tab-1-example'),
+        dcc.Tab(label='Tab Two', value='tab-2-example'),
+        dcc.Tab(label='Tab Two', value='tab-2-example'),
+
+    ]),
+    html.Div(id='tabs-content-example')
+])
+
+
+@app.callback(Output('tabs-content-example', 'children'),
+              [Input('tabs-example', 'value')])
+def render_content(tab):
+    if tab == 'tab-1-example':
+        return html.Div([
+            html.H3('Moyenne des eleves selon leur campus'),
+        dcc.Graph(
         id='example',
         figure={
             'data': [
@@ -198,10 +218,23 @@ app.layout = html.Div(children=[
                 'title': 'Success of the students'
             }
         }
-    )
-])
+    ),
 
-
+        ])
+    elif tab == 'tab-2-example':
+        return html.Div([
+            html.H3('Tab content 2'),
+            dcc.Graph(
+                id='graph-2-tabs',
+                figure={
+                    'data': [{
+                        'x': [1, 2, 3],
+                        'y': [5, 10, 6],
+                        'type': 'bar'
+                    }]
+                }
+            )
+        ])
 
 
 
