@@ -46,6 +46,8 @@ number_hired_after_fair = df.count()
 data =  (number_hired_after_fair / total_students ) * 100
 data_str = str(data)
 fair_percent = "%.1f" % data
+fair_disp1 = str(fair_percent)
+fair_display = fair_disp1 + " pourcent des etudiants sont engages apres un job forum Supinfo"
 
 
 
@@ -187,6 +189,102 @@ total_notes_marseille = int(total_str_notes_marseille)
 
 moyenne_marseille = total_notes_marseille / marseilleStudentNumber 
 print( 'la moyenne de Marseille est ' , moyenne_marseille)
+
+#calcul time after hired Paris 
+
+
+pipeline = [{'$match' : {'campus': 'Paris'}},
+            {'$group':{ '_id': '$campus', 'total': { '$sum': '$time after hired' }}}, 
+            ]
+
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+total_month_paris = df.collect()
+#print(total_month_paris)
+stringed_months_paris = str(total_month_paris[0])
+#print(stringed_months_paris)
+total_str_month_paris = stringed_months_paris[24:28]
+time_after_hired_paris = int(total_str_month_paris)
+#print('total mois paris ' , time_after_hired_paris)
+
+#Time after hired Lyon
+
+pipeline = [{'$match' : {'campus': 'Lyon'}},
+            {'$group':{ '_id': '$campus', 'total': { '$sum': '$time after hired' }}}, 
+            ]
+
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+total_month_lyon = df.collect()
+#print(total_month_lyon)
+stringed_months_lyon = str(total_month_lyon[0])
+#print(stringed_months_lyon)
+total_str_month_lyon = stringed_months_lyon[23:26]
+time_after_hired_lyon= int(total_str_month_lyon)
+#print('total mois  lyon' , time_after_hired_lyon)
+
+#Time after hired Canada
+
+pipeline = [{'$match' : {'campus': 'Canada'}},
+            {'$group':{ '_id': '$campus', 'total': { '$sum': '$time after hired' }}}, 
+            ]
+
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+total_month_canada = df.collect()
+#print(total_month_canada)
+stringed_months_canada= str(total_month_canada[0])
+#print(stringed_months_canada)
+total_str_month_canada = stringed_months_canada[25:29]
+time_after_hired_canada= int(total_str_month_canada)
+#print('total mois  canada' , time_after_hired_canada)
+
+#Time after hired Rennes
+pipeline = [{'$match' : {'campus': 'Rennes'}},
+            {'$group':{ '_id': '$campus', 'total': { '$sum': '$time after hired' }}}, 
+            ]
+
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+total_month_rennes = df.collect()
+#print(total_month_rennes)
+stringed_months_rennes= str(total_month_rennes[0])
+#print(stringed_months_rennes)
+total_str_month_rennes = stringed_months_rennes[25:28]
+time_after_hired_rennes= int(total_str_month_rennes)
+#print('total mois  rennes' , time_after_hired_rennes)
+
+#Time after hired Marseille
+pipeline = [{'$match' : {'campus': 'Marseille'}},
+            {'$group':{ '_id': '$campus', 'total': { '$sum': '$time after hired' }}}, 
+            ]
+
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+total_month_marseille = df.collect()
+#print(total_month_marseille)
+stringed_months_marseille= str(total_month_marseille[0])
+#print(stringed_months_marseille)
+total_str_month_marseille = stringed_months_marseille[28:32]
+time_after_hired_marseille= int(total_str_month_marseille)
+#print('total mois  marseille' , time_after_hired_marseille)
+
+total_months_after_hired = time_after_hired_canada + time_after_hired_lyon + time_after_hired_marseille + time_after_hired_paris + time_after_hired_rennes
+#print(total_months_after_hired)
+average_length_hired = total_months_after_hired / total_students
+print('les eleves sont engages en moyenne apres ', average_length_hired , 'mois')
+
+#moyenne embauche
+average_hired_canada = time_after_hired_canada / canadaStudentNumber 
+average_hired_lyon = time_after_hired_lyon / lyonstudentNumber
+average_hired_marseille = time_after_hired_marseille / marseilleStudentNumber
+average_hired_paris = time_after_hired_paris / parisStudentNumber
+average_hired_rennes = time_after_hired_rennes / rennesStudentNumber
+avg_hired = 'Les etudiants sont embauches en moyenne ' 
+avg_hired2 =  ' mois apres leur diplome '
+avg_hired3 = str("%.1f" % average_length_hired)
+avg_hired_to_display = avg_hired + avg_hired3 + avg_hired2
+print(avg_hired_to_display)
 app = dash.Dash()
 
 
@@ -195,9 +293,9 @@ app = dash.Dash()
 app.layout = html.Div([
     html.H1('Supinfo Big Data Dashboard'),
     dcc.Tabs(id="tabs-example", value='tab-1-example', children=[
-        dcc.Tab(label='Indicateurs de reussite', value='tab-1-example'),
-        dcc.Tab(label='Impact des job forum', value='tab-2-example'),
-        dcc.Tab(label='Tab Two', value='tab-2-example'),
+        dcc.Tab(label='Indicateurs de reussite', value='tab-1'),
+        dcc.Tab(label='Impact des job forum', value='tab-2'),
+        dcc.Tab(label='Impact de Supinfo sur embauche', value='tab-3'),
 
     ]),
     html.Div(id='tabs-content-example')
@@ -209,7 +307,7 @@ df = pd.DataFrame(dict(Impact=["Non engage apres job forum","engage apres job fo
 @app.callback(Output('tabs-content-example', 'children'),
               [Input('tabs-example', 'value')])
 def render_content(tab):
-    if tab == 'tab-1-example':
+    if tab == 'tab-1':
         return html.Div([
          #   html.H3('Moyenne des eleves selon leur campus'),
         dcc.Graph(
@@ -228,13 +326,31 @@ def render_content(tab):
 
 
 
-    elif tab == 'tab-2-example':
+    elif tab == 'tab-2':
         return html.Div([
-            html.H3('Eleves engages ou non apres le job forum'),
+            html.H3(fair_display),
             dcc.Graph(
                 id='graph-1-tabs',
              figure = px.pie(df, values='Job_Forum', names='Impact')
             )
+        ]),
+
+    elif tab == 'tab-3':
+        return html.Div([ 
+           # html.H3('Les eleves sont embauches en moyenne  mois apres leur diplome',{{average_length_hired}} ),
+            #html.H3(avg_hired_to_display),
+
+            dcc.Graph(
+        id='example',
+        figure={
+            'data': [
+                {'x': ["Campus de Rennes","Campus de Marseille","Campus du Canada","Campus de Lyon","Campus de Paris"], 'y': [average_hired_rennes,average_hired_marseille,average_hired_canada,average_hired_lyon,average_hired_paris], 'type': 'bar', 'name': 'moyenne etudiants'},
+            ],
+            'layout': {
+                'title': avg_hired_to_display
+            }
+        }
+    ),
         ])
 
 
