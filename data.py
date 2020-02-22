@@ -296,6 +296,8 @@ app.layout = html.Div([
         dcc.Tab(label='Indicateurs de reussite', value='tab-1'),
         dcc.Tab(label='Impact des job forum', value='tab-2'),
         dcc.Tab(label='Impact de Supinfo sur embauche', value='tab-3'),
+        dcc.Tab(label='Densite eleves par campus', value='tab-4'),
+
 
     ]),
     html.Div(id='tabs-content-example')
@@ -352,6 +354,23 @@ def render_content(tab):
         }
     ),
         ])
+    elif tab == 'tab-4':
+        return html.Div([ 
+           # html.H3('Les eleves sont embauches en moyenne  mois apres leur diplome',{{average_length_hired}} ),
+            #html.H3(avg_hired_to_display),
+
+            dcc.Graph(
+        id='example',
+        figure={
+            'data': [
+                {'x': ["Campus de Rennes","Campus de Marseille","Campus du Canada","Campus de Lyon","Campus de Paris"], 'y': [rennesStudentNumber,marseilleStudentNumber,canadaStudentNumber,lyonstudentNumber,parisStudentNumber], 'type': 'bar', 'name': 'Etudiants par campus'},
+            ],
+            'layout': {
+                'title': "Nombre etudiants par campus"
+            }
+        }
+    ),
+        ])    
 
 
 
