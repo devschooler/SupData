@@ -17,6 +17,8 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import plotly.express as px
+import pandas as pd
 
 
 working_directory = 'jars/*'
@@ -194,12 +196,14 @@ app.layout = html.Div([
     html.H1('Supinfo Big Data Dashboard'),
     dcc.Tabs(id="tabs-example", value='tab-1-example', children=[
         dcc.Tab(label='Indicateurs de reussite', value='tab-1-example'),
-        dcc.Tab(label='Tab Two', value='tab-2-example'),
+        dcc.Tab(label='Impact des job forum', value='tab-2-example'),
         dcc.Tab(label='Tab Two', value='tab-2-example'),
 
     ]),
     html.Div(id='tabs-content-example')
 ])
+not_hired_after_fair = total_students - number_hired_after_fair
+df = pd.DataFrame(dict(Impact=["Non engage apres job forum","engage apres job forum"], Job_Forum=[not_hired_after_fair,number_hired_after_fair]))
 
 
 @app.callback(Output('tabs-content-example', 'children'),
@@ -207,7 +211,7 @@ app.layout = html.Div([
 def render_content(tab):
     if tab == 'tab-1-example':
         return html.Div([
-            html.H3('Moyenne des eleves selon leur campus'),
+         #   html.H3('Moyenne des eleves selon leur campus'),
         dcc.Graph(
         id='example',
         figure={
@@ -215,24 +219,21 @@ def render_content(tab):
                 {'x': ["Campus de Rennes","Campus de Marseille","Campus du Canada","Campus de Lyon","Campus de Paris"], 'y': [moyenne_rennes,moyenne_marseille,moyenne_canada,moyenne_lyon,moyenne_paris], 'type': 'bar', 'name': 'moyenne etudiants'},
             ],
             'layout': {
-                'title': 'Success of the students'
+                'title': 'Moyenne des eleves selon leur campus'
             }
         }
     ),
 
         ])
+
+
+
     elif tab == 'tab-2-example':
         return html.Div([
-            html.H3('Tab content 2'),
+            html.H3('Eleves engages ou non apres le job forum'),
             dcc.Graph(
-                id='graph-2-tabs',
-                figure={
-                    'data': [{
-                        'x': [1, 2, 3],
-                        'y': [5, 10, 6],
-                        'type': 'bar'
-                    }]
-                }
+                id='graph-1-tabs',
+             figure = px.pie(df, values='Job_Forum', names='Impact')
             )
         ])
 
