@@ -285,6 +285,43 @@ avg_hired2 =  ' mois apres leur diplome '
 avg_hired3 = str("%.1f" % average_length_hired)
 avg_hired_to_display = avg_hired + avg_hired3 + avg_hired2
 print(avg_hired_to_display)
+
+
+#Contrats pro par region 
+#Paris
+pipeline = "{'$match' : {'campus': 'Paris','internship': true}}"
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+internship_paris = df.count()
+
+#Lyon
+pipeline = "{'$match' : {'campus': 'Lyon','internship': true}}"
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+internship_Lyon = df.count()
+
+#Rennes
+pipeline = "{'$match' : {'campus': 'Rennes','internship': true}}"
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+internship_Rennes = df.count()
+
+#Canada
+pipeline = "{'$match' : {'campus': 'Canada','internship': true}}"
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+internship_Canada = df.count()
+
+#Marseille
+pipeline = "{'$match' : {'campus': 'Marseille','internship': true}}"
+
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+internship_Marseille = df.count()
+
+
+
+
+
 app = dash.Dash()
 
 
@@ -297,6 +334,7 @@ app.layout = html.Div([
         dcc.Tab(label='Impact des job forum', value='tab-2'),
         dcc.Tab(label='Impact de Supinfo sur embauche', value='tab-3'),
         dcc.Tab(label='Densite eleves par campus', value='tab-4'),
+        dcc.Tab(label='Statistiques Contrat Pro', value='tab-5'),
 
 
     ]),
@@ -370,7 +408,25 @@ def render_content(tab):
             }
         }
     ),
-        ])    
+        ]) 
+
+    elif tab == 'tab-5':
+        return html.Div([ 
+           # html.H3('Les eleves sont embauches en moyenne  mois apres leur diplome',{{average_length_hired}} ),
+            #html.H3(avg_hired_to_display),
+
+            dcc.Graph(
+        id='example',
+        figure={
+            'data': [
+                {'x': ["Campus de Rennes","Campus de Marseille","Campus du Canada","Campus de Lyon","Campus de Paris"], 'y': [internship_Rennes,internship_Marseille,internship_Canada,internship_Lyon,internship_paris], 'type': 'bar', 'name': 'Etudiants par campus'},
+            ],
+            'layout': {
+                'title': "Nombre de contrat pro par campus"
+            }
+        }
+    ),
+        ])       
 
 
 
