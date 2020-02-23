@@ -146,7 +146,6 @@ pipeline = [{'$match' : {'campus': 'Canada'}},
             {'$group':{ '_id': '$campus', 'total': { '$sum': '$overall average' }}}, 
             ]
 
-          #  {'$group':{'_id':{'myid':'$myid'}, 'record':{'$first':'$$ROOT'}}}, 
 
 df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
 
@@ -319,8 +318,35 @@ df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mong
 internship_Marseille = df.count()
 
 
+#Competitors
+pipeline = "{'$match' : {'mobility': true}}"
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+total_changing_school = df.count()
+percent_school_changing = (total_changing_school / total_students) * 100 
+str_total_changing_school = str("%.1f" % percent_school_changing)
 
 
+#IIM
+pipeline = "{'$match' : {'next school': 'IIM'}}"
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+IIMCompetitor = df.count()
+
+#Epitech
+pipeline = "{'$match' : {'next school': 'Epitech'}}"
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+EpitechCompetitor = df.count()
+
+
+#42
+pipeline = "{'$match' : {'next school': 'Ecole 42'}}"
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+Competitor42 = df.count()
+
+#Create str 
+strPhrase1 = " percent of the students change school"
+totalPhrase = str_total_changing_school + strPhrase1  
+#Create dF
+df2 = pd.DataFrame(dict(Competitor=["Epitech","42","IIM"], Competitor2=[EpitechCompetitor,Competitor42,IIMCompetitor]))
 
 app = dash.Dash()
 
@@ -335,6 +361,8 @@ app.layout = html.Div([
         dcc.Tab(label='Impact de Supinfo sur embauche', value='tab-3'),
         dcc.Tab(label='Densite eleves par campus', value='tab-4'),
         dcc.Tab(label='Statistiques Contrat Pro', value='tab-5'),
+        dcc.Tab(label='Ecoles Concurrentes', value='tab-6'),
+
 
 
     ]),
@@ -426,7 +454,17 @@ def render_content(tab):
             }
         }
     ),
-        ])       
+        ])
+    
+    elif tab == 'tab-6':
+        return html.Div([
+            html.H3(totalPhrase),
+            dcc.Graph(
+                id='graph-1-tabs',
+             figure = px.pie(df2, values='Competitor2', names='Competitor')
+            )
+        ]),       
+       
 
 
 
