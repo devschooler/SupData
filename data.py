@@ -348,6 +348,32 @@ totalPhrase = str_total_changing_school + strPhrase1
 #Create dF
 df2 = pd.DataFrame(dict(Competitor=["Epitech","42","IIM"], Competitor2=[EpitechCompetitor,Competitor42,IIMCompetitor]))
 
+#Organization 
+#Microsoft
+pipeline = "{'$match' : {'Organization': 'Microsoft'}}"
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+MicrosoftOrg = df.count()
+
+#Altran
+pipeline = "{'$match' : {'Organization': 'Altran'}}"
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+AltranOrg = df.count()
+
+#Alten
+pipeline = "{'$match' : {'Organization': 'Alten'}}"
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+AltenOrg = df.count()
+
+#Ubisoft
+pipeline = "{'$match' : {'Organization': 'Ubisoft'}}"
+df = spark.read.format("com.mongodb.spark.sql.DefaultSource").option("uri","mongodb://127.0.0.1/SupinfoDB.students").option("pipeline",pipeline).load()
+UbisoftOrg = df.count()
+
+df3 = pd.DataFrame(dict(Company=["Ubisoft","Microsoft","Alten","Altran"], Company2=[UbisoftOrg,MicrosoftOrg,AltenOrg,AltranOrg]))
+
+
+
+
 app = dash.Dash()
 
 
@@ -362,6 +388,8 @@ app.layout = html.Div([
         dcc.Tab(label='Densite eleves par campus', value='tab-4'),
         dcc.Tab(label='Statistiques Contrat Pro', value='tab-5'),
         dcc.Tab(label='Ecoles Concurrentes', value='tab-6'),
+        dcc.Tab(label='Statistiques d embauches ', value='tab-7'),
+
 
 
 
@@ -463,7 +491,16 @@ def render_content(tab):
                 id='graph-1-tabs',
              figure = px.pie(df2, values='Competitor2', names='Competitor')
             )
-        ]),       
+        ]),
+    
+    elif tab == 'tab-7':
+        return html.Div([
+            html.H3("Entreprises qui embauchent apres un diplome Supinfo"),
+            dcc.Graph(
+                id='graph-1-tabs',
+             figure = px.pie(df3, values='Company2', names='Company')
+            )
+        ]),        
        
 
 
